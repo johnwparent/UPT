@@ -1,7 +1,6 @@
 import sys
 import os
 
-
 class DDict(object):
     def __init__(self, init_dict = None):
         self.back = {}
@@ -14,6 +13,13 @@ class DDict(object):
         self.front[item] = val
         self.back[val] = item
 
+    def __contains__(self, item):
+        try:
+            self.front[item]
+        except KeyError:
+            return False
+        return True
+
     def __hash__(self):
         return hash(self.back) + hash(self.front)
 
@@ -22,12 +28,35 @@ class ContextManager(object):
     def __init__(self):
         self.unique_words = 0
         self.total_contexts = 0
-        self.contexts = set()
+        self.contexts = {}
         super().__init__()
 
+    def __getitem__(self, item):
+        if item not in self.contexts:
+            c = Context(item)
+            self.contexts[item] = c
+        return self.contexts[item]
 
-    def add_context(self, context):
-        pass
+    def add_w_context(self, word, context):
+        self.contexts[word] = context
+
+    def add_context(self, context, pre, post):
+        if pre in self.contexts:
+            pre = self.contexts[pre]
+        else:
+            pr = Context(pre)
+            self.add_w_context(pre, pr)
+            pre = pr
+
+        if post and post in self.contexts:
+            post = self.contexts[post]
+        else:
+            if post:
+                po = Context(post)
+                self.add_w_context(post, po)
+                post = po
+        context.add_context(pre, post)
+
 
 class Context(object):
     def __init__(self, token, obj=DDict()):
@@ -36,12 +65,18 @@ class Context(object):
         super().__init__()
 
     def __hash__(self):
-        return int(self.token)
+        return hash(self.token)
 
-    def add_context(self, context):
-        self.__context[context]
+    def get_context(self):
+        return self.__context
 
+    def add_context(self, contexta, contextb):
+        if contexta and contexta not in self.__context:
+            self.__context[contexta] = 1
+        elif contexta:
+            self.__context[contexta] += 1
 
-
-
-
+        if contextb and contextb not in self.__context:
+            self.__context[contextb] = 1
+        elif contextb:
+            self.__context[contextb] += 1
