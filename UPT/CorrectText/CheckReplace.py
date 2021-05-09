@@ -1,39 +1,127 @@
 import os
+import ntlk
 from ..Context import data_manager as dm
 from ..Context import context as c
 
+alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+
 def execute_alterations(word, count=1):
     options = []
-    for permut in [drop_letter, swap_order, rev]:
+    for permut in [drop_letter, swap_order, rev, replace_letter, add_letter]:
         options.extend(permut(word))
     return options
+
+def add_letter(word, count=1):
+    return [ word[:idx]+letter+word[idx:] for idx in range(len(word)) for letter in alphabet ]
 
 def drop_letter(word, count=1):
     return [ word[:idx]+word[idx+count:] for idx in range(len(word)) ]
 
 def swap_order(word, count=1):
-    return [word[idx+1]+word[idx]+word[idx+1:]  for idx in range(len(word)-1)]
+    return [ word[idx+1]+word[idx]+word[idx+1:]  for idx in range(len(word)-1) ]
 
 def rev(word, count=1):
-    return [rev_substr(word, count, idx) for idx in range(len(word))]
+    return [ rev_substr(word, count, idx) for idx in range(len(word)) ]
 
 def rev_substr(word, count, idx):
     return word[:idx]+word[idx+count:idx-1:-1]+word[idx+count:]
 
+def replace_letter(word, count = 1):
+    return [ word[:idx]+letter+word[idx+1:] for idx in range(len(word)) for letter in alphabet ]
+
 def load_known_words():
-    file_n = "../../data/words.txt"
+    file_n = os.path.join(os.getcwd(),"data\\words.txt")
     word_s = set()
     with open(file_n,"r") as words:
         for word in words:
             word_s.add(word)
     return word_s
 
+def compute_distance(worda, wordb):
+    return nltk.metrics.edit_distance(worda, wordb)
+
+def use_context(total_words, known_words):
+    potential_words = total_words & known_words
+    max_f = 0
+    max_w = ""
+    if potential_words:
+        for w in list(potential_words):
+            if tot_dict[w] > max_w:
+                max_w = tot_dict[w]
+                max_w = w
+        return w
+    else:
+        return None
 
 def spell_check_driver(input_words):
-    spell_dict = load_known_words()
-    dm.load_context("../..")
-    for word in input_words:
+    # check if there are words before or back or both
+    # if just one or the other reference that for context
+    # if both, do intersection of options
+    # and compute intersection of first deg sep and that
+    # and then if thats empty do second degree
+    # if we have neither, do dict of know words just by order of changing
+    # if we have it in a context, then do by highest context valuespell_dict = load_known_words()
+    cm = dm.load_context("../..")
+    l = len(input_words)
+    output = []
+    known_set = set(spell_dict)
+    for ct,word in enumerate(input_words):
+        if word not in alphabet:
+            output.append(word)
+            continue
+        output.append(" ")
         if word not in spell_dict:
             first_deg_sep = execute_alterations(word)
             sec_deg_sep = execute_alterations(word,count=2)
+            pre, pos = ""
+            if ct-1 >= 0:
+                pre = input_words[ct-1]
+            if ct+1 < l:
+                pos = input_words[ct+1]
 
+            ctx_pre = None
+            ctx_post = None
+
+            if pre and pos:
+                ctx_pre_f, ctx_pre_b = cm[pre].get_context()
+                ctx_post_f, ctx_post_b = cm[pos].get_context()
+                tot_dict = ctx_post_f.update(ctx_pre_f)
+                tot_ctx_wrds = set(ctx_pre_f.keys()) & set(ctx_post_f.keys())
+                suggested = use_context(tot_ctx_wrds, known_set)
+            elif pre:
+                ctx_pre_f, ctx_pre_b = cm[pre]
+                tot_ctx_wrds = set(ctx_pre_f.keys())
+                suggested = use_context(tot_ctx_wrds, known_set)
+            elif pos:
+                ctx_post_f, ctx_post_b = cm[pos]
+                tot_ctx_wrds = set(ctx_post_f.keys())
+                suggested = use_context(tot_ctx_wrds, known_set)
+
+            else:
+                first_deg_set = set(first_deg_sep)
+                first_inter = known_set & first_deg_set
+                if first_inter:
+                    lst = list(first_inter)
+                    lst_dict = {}
+                    for test_word in lst:
+                        dst = compute_distance(test_word, word)
+                        lst_dict[dst] = test_word
+                    suggested = lst_dict[sorted(lst_dict.keys())[0]]
+                else:
+                    sec_deg_set = set(sec_deg_sep)
+                    second_inter = known_set & sec_deg_set
+                    if not second_inter:
+                        suggested = None
+                        # we have no found words, this mispelled word is too messed up to be anything
+                    lst = list(second_inter)
+                    lst_dict = {}
+                    for test_word in lst:
+                        dst = compute_distance(test_word, word)
+                        lst_dict[dst] = test_word
+                    suggested = lst_dict[sorted(lst_dict.keys())[0]]
+            if suggested:
+                output.append(suggested)
+            else:
+                print("Unable to resolve improved spelling for word: %s" %word)
+                output.append(word)
+    return output

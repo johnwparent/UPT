@@ -1,4 +1,4 @@
-import pickle, pickletools
+import pickle
 import requests
 import os, sys, re
 from xml.etree import ElementTree
@@ -64,10 +64,17 @@ def pull_down_data(data_root):
     data = sanitze_data(proj_gut.text)
     build_context(data)
 
-def load_context(self):
-    pass
-    # if we cant find binary pickle file, do the download step
-
+def load_context(data):
+    data_dir = "../../data/context.pickle"
+    cm = None
+    if not os.path.exists(os.path.join(os.getcwd(),data_dir)):
+        cm = pull_down_data(data)
+        with open(os.path.join(os.getcwd(),data_dir),"wb") as pickle_data:
+            pickle.dump(cm, pickle_data, pickle.HIGHEST_PROTOCALL)
+    else:
+        with open(os.path.join(os.getcwd(),data_dir),"rb") as pickle_data:
+            cm = pickle.load(pickle_data)
+    return cm
 
 def build_context(input):
     cm = ContextManager()
@@ -94,9 +101,3 @@ def build_context(input):
 
 
     return cm
-
-def data_to_disk():
-    pass
-
-def data_from_disk():
-    pass

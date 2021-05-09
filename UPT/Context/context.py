@@ -7,7 +7,7 @@ class DDict(object):
         self.front = {}
 
     def __getitem__(self,item):
-        return (self.front[item],self.back[self.front[item]])
+        return (self.front[item])
 
     def __setitem__(self,item,val):
         self.front[item] = val
@@ -19,6 +19,12 @@ class DDict(object):
         except KeyError:
             return False
         return True
+
+    def get_front():
+        return self.front
+
+    def get_back():
+        return self.back
 
     def __hash__(self):
         return hash(self.back) + hash(self.front)
@@ -68,7 +74,7 @@ class Context(object):
         return hash(self.token)
 
     def get_context(self):
-        return self.__context
+        return (self.__context.get_front(), self.__context.get_back())
 
     def add_context(self, contexta, contextb):
         if contexta and contexta not in self.__context:
