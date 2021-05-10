@@ -6,7 +6,7 @@ import glob
 from .context import ContextManager, Context
 
 def sanitze_data(data):
-    SYMS = r'[^\s\w0-9\r\n\t]'
+    SYMS = r'[^\s\w]'
     ndata = re.sub(SYMS,"",data)
     data = ndata.lower()
     d_lst = data.split(" ")
@@ -41,13 +41,17 @@ def parse_node_attr(attr):
 def find_url(file_):
     ns = {"dcterms": "http://purl.org/dc/terms/"}
 
-    with open(file_, "r") as xml_direc:
-        xml_parser = ElementTree.parse(xml_direc)
-        xml_root = xml_parser.getroot()
-        for node in xml_root.findall(".//dcterms:hasFormat", ns):
-            url = xml_walker(node)
-            if url:
-                return url
+    with open(file_, "r",encoding='utf-8') as xml_direc:
+        try:
+            xml_parser = ElementTree.parse(xml_direc)
+            xml_root = xml_parser.getroot()
+            for node in xml_root.findall(".//dcterms:hasFormat", ns):
+                url = xml_walker(node)
+                if url:
+                    return url
+        except UnicodeDecodeError:
+            print("Unable to read file %s; UnicodeDecodeError"%file_)
+        return None
 
 def xml_walker(root):
     url = ""
@@ -59,20 +63,31 @@ def xml_walker(root):
 
 def pull_down_data(data_root):
     files = walk_files_directory(data_root)
-    url = find_url(files[0])
-    proj_gut = requests.get(url, stream=True)
-    data = sanitze_data(proj_gut.text)
-    build_context(data)
+    print(len(files))
+    urls = []
+    for x in range(40000):
+        url = find_url(files[x])
+        if url:
+            urls.append(url)
+    data = []
+    for url in urls:
+        proj_gut = requests.get(url, stream=True)
+        data.extend(sanitze_data(proj_gut.text))
+
+    return build_context(data)
 
 def load_context(data):
     data_dir = "../../data/context.pickle"
     cm = None
-    if not os.path.exists(os.path.join(os.getcwd(),data_dir)):
+    curr_path = os.path.abspath(os.path.dirname(__file__))
+    data_dir = os.path.join(curr_path,data_dir)
+    if not os.path.exists(data_dir):
         cm = pull_down_data(data)
-        with open(os.path.join(os.getcwd(),data_dir),"wb") as pickle_data:
-            pickle.dump(cm, pickle_data, pickle.HIGHEST_PROTOCALL)
+
+        with open(data_dir,"wb") as pickle_data:
+            pickle.dump(cm, pickle_data, -1)
     else:
-        with open(os.path.join(os.getcwd(),data_dir),"rb") as pickle_data:
+        with open(data_dir,"rb") as pickle_data:
             cm = pickle.load(pickle_data)
     return cm
 

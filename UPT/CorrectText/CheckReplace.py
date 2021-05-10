@@ -30,7 +30,7 @@ def replace_letter(word, count = 1):
     return [ word[:idx]+letter+word[idx+1:] for idx in range(len(word)) for letter in alphabet ]
 
 def load_known_words():
-    file_n = os.path.join(os.getcwd(),"data\\words.txt")
+    file_n = os.path.join(os.path.abspath(os.path.dirname(__file__)),"data/words.txt")
     word_s = set()
     with open(file_n,"r") as words:
         for word in words:
