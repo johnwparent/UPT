@@ -7,8 +7,8 @@ def spell_check():
     text = textbox.get("1.0","end-1c")
     text_list = text.split()
     print(text_list)
-    # list to store correction for each word
-    correction_list = ["replacement", "test" ] #text_list     # using text_list as placeholder
+    # list to store corrections for each word
+    correction_list = ["replacement", "test","f" ] #text_list     # this as a placeholder (only test w 3 or less words)
     # creating popup, headers, and submit button
     spell = tk.Tk()
     spell.title("Spellcheck")
@@ -20,15 +20,13 @@ def spell_check():
         tk.Label(master=spell, text=text_list[i],height=5, bg='white').grid(column=0,row=i+1, sticky='nesw')
         tk.Label(master=spell, text=correction_list[i],height=5,bg='green').grid(column=1,row=i+1, sticky='nesw')
         # if this button is clicked, replace word in list with correction
-        tk.Button(master=spell, text="Replace", bg= 'yellow', command=lambda:replaceWord(text_list, correction_list, i)).grid(column=2,row=i+1, sticky='nesw')
-    # recombining words into a string
-    result = " ".join(text_list)
-    print(result)
-    s_submit = tk.Button(master=spell, text="Done", bg='green', command=lambda: [set_text_input(result),spell.destroy()] ).grid(column=0, columnspan=3,row=len(text_list)+1, sticky='nesw')
+        tk.Button(master=spell, text="Replace", bg= 'yellow', command=lambda i=i:replaceWord(text_list, correction_list, i)).grid(column=2,row=i+1, sticky='nesw')
+    # button to submit changes
+    s_submit = tk.Button(master=spell, text="Done", bg='green', command=lambda: [set_text_input(text_list),spell.destroy()] ).grid(column=0, columnspan=3,row=len(text_list)+1, sticky='nesw')
     spell.mainloop()
     
 def predict():
-    # rabs textbox input and displays popup window with prediction options. Sets textbox with original text + result if user selects it.
+    # grabs textbox input and displays popup window with prediction options. Sets textbox with original text + result if user selects it.
     text = textbox.get("1.0","end-1c")
     # doing text prediction, returning a list of 3 options
     list = ["A", "B","C"]
@@ -41,8 +39,9 @@ def predict():
     p_submit = tk.Button(master=pred, text="No Thanks!", command=lambda: pred.destroy()).grid(column=0, row=3, sticky='nesw')
     pass
 
-def set_text_input(text):
-    # updates text in textbox
+def set_text_input(t_list):
+    # recombines list and changes textbox
+    text = " ".join(t_list) 
     textbox.delete(1.0, "end")
     textbox.insert(1.0, text)
 
@@ -53,6 +52,7 @@ def add_word(text):
 
 def replaceWord(list1, list2, i):
    list1[i]=list2[i]
+
 
 
 
