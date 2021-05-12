@@ -25,9 +25,8 @@ def spell_check():
     result = " ".join(text_list)
     print(result)
     s_submit = tk.Button(master=spell, text="Done", bg='green', command=lambda: [set_text_input(result),spell.destroy()] ).grid(column=0, columnspan=3,row=len(text_list)+1, sticky='nesw')
+    spell.mainloop()
     
-
-
 def predict():
     # rabs textbox input and displays popup window with prediction options. Sets textbox with original text + result if user selects it.
     text = textbox.get("1.0","end-1c")
