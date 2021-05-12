@@ -5,15 +5,28 @@ from tkinter import ttk
 def spell_check():
     # grabs textbox input and displays popup window showing spellcheck options. Sets textbox with result if user makes changes.
     text = textbox.get("1.0","end-1c")
-    result = "Owen"
-    # creating popup
+    text_list = text.split()
+    print(text_list)
+    # list to store correction for each word
+    correction_list = ["replacement", "test" ] #text_list     # using text_list as placeholder
+    # creating popup, headers, and submit button
     spell = tk.Tk()
     spell.title("Spellcheck")
     sl1 = tk.Label(master=spell, text="Word",height=5).grid(column=0,row=0)
     sl2 = tk.Label(master=spell, text="Replacement",height=5).grid(column=1,row=0)
-    sl3 = tk.Label(master=spell, text="Change? Y/N",height=5).grid(column=2,row=0)
-    s_submit = tk.Button(master=spell, text="Submit Changes", bg='green', command=lambda: [set_text_input(result), spell.destroy()] ).grid(column=0, columnspan=3,row=1, sticky='nesw')
-    pass
+    sl3 = tk.Label(master=spell, text="Replace",height=5).grid(column=2,row=0)
+    # displaying options for each word
+    for i in range(0, len(text_list),1):
+        tk.Label(master=spell, text=text_list[i],height=5, bg='white').grid(column=0,row=i+1, sticky='nesw')
+        tk.Label(master=spell, text=correction_list[i],height=5,bg='green').grid(column=1,row=i+1, sticky='nesw')
+        # if this button is clicked, replace word in list with correction
+        tk.Button(master=spell, text="Replace", bg= 'yellow', command=lambda:replaceWord(text_list, correction_list, i)).grid(column=2,row=i+1, sticky='nesw')
+    # recombining words into a string
+    result = " ".join(text_list)
+    print(result)
+    s_submit = tk.Button(master=spell, text="Done", bg='green', command=lambda: [set_text_input(result),spell.destroy()] ).grid(column=0, columnspan=3,row=len(text_list)+1, sticky='nesw')
+    
+
 
 def predict():
     # rabs textbox input and displays popup window with prediction options. Sets textbox with original text + result if user selects it.
@@ -38,6 +51,9 @@ def add_word(text):
     # adds word to end of textbox
     text = " " + text
     textbox.insert("end-1c", text)
+
+def replaceWord(list1, list2, i):
+   list1[i]=list2[i]
 
 
 
