@@ -2,9 +2,9 @@
 import tkinter as tk
 from tkinter import ttk
 import os
-from .Context import data_manager as dm
-from .Context import context as c
-from .CorrectText import load_known_words
+from UPT.Context import data_manager as dm
+from UPT.Context import context as c
+from UPT.CorrectText.check_replace import load_known_words
 
 
 spell_dict = load_known_words()
