@@ -44,11 +44,10 @@ def predict():
     pred = tk.Tk()
     pred.title("Text Prediction")
     instructions = tk.Label(master=pred, text="Click a suggestion to add it to your text, or click 'No Thanks!' to exit.",height=5).grid(column=0,row=0)
-    sl1 = tk.Button(master=pred, text=list[0], bg = 'green', command=lambda: [add_word(list[0]), pred.destroy()], height=5).grid(column=0,row=1, sticky='nesw')
-    sl2 = tk.Button(master=pred, text=list[1], bg = 'yellow', command=lambda: [add_word(list[1]), pred.destroy()], height=5).grid(column=0,row=2, sticky='nesw')
-    sl3 = tk.Button(master=pred, text=list[2], bg = 'green', command=lambda: [add_word(list[2]), pred.destroy()], height=5).grid(column=0,row=3, sticky='nesw')
+    sl1 = tk.Button(master=pred, text=sugg_list[0], bg = 'green', command=lambda: [add_word(sugg_list[0]), pred.destroy()], height=5).grid(column=0,row=1, sticky='nesw')
+    sl2 = tk.Button(master=pred, text=sugg_list[1], bg = 'yellow', command=lambda: [add_word(sugg_list[1]), pred.destroy()], height=5).grid(column=0,row=2, sticky='nesw')
+    sl3 = tk.Button(master=pred, text=sugg_list[2], bg = 'green', command=lambda: [add_word(sugg_list[2]), pred.destroy()], height=5).grid(column=0,row=3, sticky='nesw')
     p_submit = tk.Button(master=pred, text="No Thanks!", bg = 'red', command=lambda: pred.destroy()).grid(column=0, row=4, sticky='nesw')
-    pass
 
 def set_text_input(t_list):
     # recombines list and changes textbox
@@ -62,7 +61,7 @@ def add_word(text):
     textbox.insert("end-1c", text)
 
 def replaceWord(list1, list2, i):
-   list1[i]=list2[i]
+    list1[i]=list2[i]
 
 
 
