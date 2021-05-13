@@ -74,7 +74,7 @@ def spell_check_driver(input_words, spell_dict, cm):
         if word not in spell_dict:
             first_deg_sep = execute_alterations(word)
             sec_deg_sep = execute_alterations(word,count=2)
-            all_changes = set.union(first_deg_sep,sec_deg_sep)
+            all_changes = first_deg_sep+sec_deg_sep
             pre = ""
             pos = ""
             if ct-1 >= 0:
