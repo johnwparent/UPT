@@ -20,10 +20,10 @@ class DDict(object):
             return False
         return True
 
-    def get_front():
+    def get_front(self):
         return self.front
 
-    def get_back():
+    def get_back(self):
         return self.back
 
     def __hash__(self):

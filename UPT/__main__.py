@@ -1,13 +1,13 @@
 import os, sys, platform
-import Context
-import CorrectText
+from UPT import Context
+from UPT import CorrectText
 import argparse
 
 
 
 def main():
-    words = load_words()
-    CorrectText.CheckReplace.spell_check_driver()
+    words = ["hello","world","my","name","is","hans","theere"]
+    print(CorrectText.check_replace.spell_check_driver(words))
 
 if __name__ == '__main__':
     main()

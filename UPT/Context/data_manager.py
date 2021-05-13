@@ -1,9 +1,9 @@
 import pickle
 import requests
-import os, sys, re
+import os, re
 from xml.etree import ElementTree
 import glob
-from .context import ContextManager, Context
+from .context import ContextManager
 
 def sanitze_data(data):
     SYMS = r'[^\s\w]'
@@ -65,7 +65,7 @@ def pull_down_data(data_root):
     files = walk_files_directory(data_root)
     print(len(files))
     urls = []
-    for x in range(40000):
+    for x in range(5000):
         url = find_url(files[x])
         if url:
             urls.append(url)
@@ -82,6 +82,7 @@ def load_context(data):
     curr_path = os.path.abspath(os.path.dirname(__file__))
     data_dir = os.path.join(curr_path,data_dir)
     if not os.path.exists(data_dir):
+        print("Pulling data from proj gut")
         cm = pull_down_data(data)
 
         with open(data_dir,"wb") as pickle_data:

@@ -1,5 +1,5 @@
 import os
-import ntlk
+import nltk
 from ..Context import data_manager as dm
 from ..Context import context as c
 
@@ -30,26 +30,26 @@ def replace_letter(word, count = 1):
     return [ word[:idx]+letter+word[idx+1:] for idx in range(len(word)) for letter in alphabet ]
 
 def load_known_words():
-    file_n = os.path.join(os.path.abspath(os.path.dirname(__file__)),"data/words.txt")
+    file_n = os.path.join(os.path.abspath(os.path.dirname(__file__)),"../../data/words.txt")
     word_s = set()
     with open(file_n,"r") as words:
         for word in words:
-            word_s.add(word)
+            word_s.add(word.strip("\n").lower())
     return word_s
 
 def compute_distance(worda, wordb):
     return nltk.metrics.edit_distance(worda, wordb)
 
-def use_context(total_words, known_words):
+def use_context(total_words, known_words, tot_dict):
     potential_words = total_words & known_words
     max_f = 0
     max_w = ""
     if potential_words:
         for w in list(potential_words):
-            if tot_dict[w] > max_w:
-                max_w = tot_dict[w]
+            if tot_dict[w] > max_f:
+                max_f = tot_dict[w]
                 max_w = w
-        return w
+        return max_w
     else:
         return None
 
@@ -60,20 +60,24 @@ def spell_check_driver(input_words):
     # and compute intersection of first deg sep and that
     # and then if thats empty do second degree
     # if we have neither, do dict of know words just by order of changing
-    # if we have it in a context, then do by highest context valuespell_dict = load_known_words()
+    # if we have it in a context, then do by highest context value
+    spell_dict = load_known_words()
     cm = dm.load_context("../..")
+
     l = len(input_words)
     output = []
     known_set = set(spell_dict)
+    import pdb; pdb.set_trace()
     for ct,word in enumerate(input_words):
-        if word not in alphabet:
+        if word in alphabet:
             output.append(word)
             continue
         output.append(" ")
         if word not in spell_dict:
             first_deg_sep = execute_alterations(word)
             sec_deg_sep = execute_alterations(word,count=2)
-            pre, pos = ""
+            pre = ""
+            pos = ""
             if ct-1 >= 0:
                 pre = input_words[ct-1]
             if ct+1 < l:
@@ -83,19 +87,19 @@ def spell_check_driver(input_words):
             ctx_post = None
 
             if pre and pos:
-                ctx_pre_f, ctx_pre_b = cm[pre].get_context()
-                ctx_post_f, ctx_post_b = cm[pos].get_context()
-                tot_dict = ctx_post_f.update(ctx_pre_f)
+                (ctx_pre_f, ctx_pre_b) = cm[pre].get_context()
+                (ctx_post_f, ctx_post_b) = cm[pos].get_context()
+                tot_dict = {**ctx_post_f,**ctx_pre_f}
                 tot_ctx_wrds = set(ctx_pre_f.keys()) & set(ctx_post_f.keys())
-                suggested = use_context(tot_ctx_wrds, known_set)
+                suggested = use_context(tot_ctx_wrds, known_set, tot_dict)
             elif pre:
-                ctx_pre_f, ctx_pre_b = cm[pre]
+                (ctx_pre_f, ctx_pre_b) = cm[pre].get_context()
                 tot_ctx_wrds = set(ctx_pre_f.keys())
-                suggested = use_context(tot_ctx_wrds, known_set)
+                suggested = use_context(tot_ctx_wrds, known_set, ctx_pre_f)
             elif pos:
-                ctx_post_f, ctx_post_b = cm[pos]
+                (ctx_post_f, ctx_post_b) = cm[pos].get_context()
                 tot_ctx_wrds = set(ctx_post_f.keys())
-                suggested = use_context(tot_ctx_wrds, known_set)
+                suggested = use_context(tot_ctx_wrds, known_set, ctx_post_f)
 
             else:
                 first_deg_set = set(first_deg_sep)
@@ -124,4 +128,6 @@ def spell_check_driver(input_words):
             else:
                 print("Unable to resolve improved spelling for word: %s" %word)
                 output.append(word)
+        else:
+            output.append(word)
     return output
