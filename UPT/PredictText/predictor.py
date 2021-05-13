@@ -14,14 +14,16 @@ def collect_trigrams(word,prev_word,context):
     _, freq = context[word].get_context()
     freq_sort = sorted(freq.keys())
     tgs = set()
-    for i in range(0,5):
-        tgs.add(freq[freq_sort[i]].token)
-    _, freq2 = context[prev_word].get_context()
-    freq2_sort = sorted(freq2.keys())
     p_tgs = set()
-    for j in range(0,5):
-        p_tgs.add(freq2[freq2_sort[i]].token)
-    
+    if len(freq_sort) > 4:
+        for i in range(0,5):
+            tgs.add(freq[freq_sort[i]].token)
+        _, freq2 = context[prev_word].get_context()
+        freq2_sort = sorted(freq2.keys())
+        if len(freq2_sort) > 4:
+            for j in range(0,5):
+                p_tgs.add(freq2[freq2_sort[i]].token)
+        
     ovr = p_tgs & tgs
     if ovr:
         return ovr
