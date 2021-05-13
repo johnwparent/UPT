@@ -34,7 +34,7 @@ def collect_bigrams(word, context, a, b):
     _, freq = context[word].get_context()
     freq_sort = sorted(freq.keys())[::-1]
     bgs = []
-    if len(freq_sort) > 4:
+    if len(freq_sort) > b-1:
         for i in range(a,b):
             bgs.append(freq[freq_sort[i]])
     return bgs
@@ -42,12 +42,12 @@ def collect_bigrams(word, context, a, b):
 def remove_words(list, bg):
     # removes words in list from trigram lists
     # this seems inefficient
-    bg_c = bg
+    bg_c = []
     if bg:
         for badword in list:
             for b_entry in bg:
-                if badword in b_entry:
-                    bg_c.remove(b_entry)
+                if b_entry != badword:
+                    bg_c.append(b_entry)
     return bg_c
 
 def get_restarter(known_words):
@@ -70,7 +70,10 @@ def generate_suggestions(words, context, known_words):
     # 2. get top bigrams using word
     bgs = collect_bigrams(word,context,0,5)
     bgs1 = collect_bigrams(word,context,15,20)
-    bgs2 = collect_bigrams(word,context,1050,1055)
+    bgs2 = collect_bigrams(word,context,250,255)
+    print(bgs)
+    print(bgs1)
+    print(bgs2)
 
     # 3. remove words in previous words list from lists
     bgs = remove_words(words,bgs)
@@ -78,17 +81,11 @@ def generate_suggestions(words, context, known_words):
     bgs2 = remove_words(words,bgs2)
     # 4. create a list to populate with top 3 suggested words
     suggestion_list = []
-    # if we have a trigram, that should be #1
-    # if tgs:
-    #     for trigram in tgs:
-    #         suggestion_list.append(trigram)
-    # # fill remaining entries with 2 most common bigrams
-    # n = len(suggestion_list)
-    if bgs:
+    if len(bgs)>0:
         suggestion_list.append(bgs[0])
-        if bgs1:
+        if len(bgs1)>0:
             suggestion_list.append(bgs1[0])
-            if bgs2:
+            if len(bgs2)>0:
                 suggestion_list.append(bgs2[0])
                 
     # if there are still less than 3 elements in suggestion_list, fill it with random words
