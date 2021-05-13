@@ -4,7 +4,8 @@ from tkinter import ttk
 import os
 from UPT.Context import data_manager as dm
 from UPT.Context import context as c
-from UPT.CorrectText.check_replace import load_known_words
+from UPT.CorrectText.check_replace import load_known_words, spell_check_driver
+from UPT.PredictText.predictor import generate_suggestions
 
 
 spell_dict = load_known_words()
@@ -13,9 +14,9 @@ cm = dm.load_context(os.path.join(os.path.dirname(os.path.abspath(__file__)),"..
 def spell_check():
     # grabs textbox input and displays popup window showing spellcheck options. Sets textbox with result if user makes changes.
     text = textbox.get("1.0","end-1c")
-    text_list = text.split()
-    # list to store corrections for each word
-    correction_list = ["replacement", "test","f" ] #text_list     # this as a placeholder (only test w 3 or less words)
+    text_list = text.split(" ")
+    # list with corrections for each word
+    correction_list = spell_check_driver(text_list)
     # creating popup, headers, and submit button
     spell = tk.Tk()
     spell.title("Spellcheck")
@@ -36,8 +37,9 @@ def spell_check():
 def predict():
     # grabs textbox input and displays popup window with prediction options. Sets textbox with original text + result if user selects it.
     text = textbox.get("1.0","end-1c")
+    text_list = text.split(" ")
     # doing text prediction, returning a list of 3 options
-    list = ["A", "B","C"]
+    sugg_list = generate_suggestions(text_list, cm, spell_dict)
     # creating popup
     pred = tk.Tk()
     pred.title("Text Prediction")
