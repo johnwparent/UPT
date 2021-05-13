@@ -18,7 +18,7 @@ def drop_letter(word, count=1):
     return [ word[:idx]+word[idx+count:] for idx in range(len(word)) ]
 
 def swap_order(word, count=1):
-    return [ word[idx+1]+word[idx]+word[idx+1:]  for idx in range(len(word)) ]
+    return [ word[idx:]+word[idx+1]+word[idx]+word[idx+1:]  for idx in range(len(word)-1) ]
 
 def rev(word, count=1):
     return [ rev_substr(word, count, idx) for idx in range(len(word)) ]
@@ -34,7 +34,7 @@ def load_known_words():
     word_s = set()
     with open(file_n,"r") as words:
         for word in words:
-            word_s.add(word.strip("\n").lower())
+            word_s.add(word.strip("\n"))
     return word_s
 
 def compute_distance(worda, wordb):
