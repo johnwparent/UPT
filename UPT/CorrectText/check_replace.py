@@ -120,7 +120,8 @@ def spell_check_driver(input_words, spell_dict, cm):
                     for test_word in lst:
                         dst = compute_distance(test_word, word)
                         lst_dict[dst] = test_word
-                    suggested = lst_dict[sorted(lst_dict.keys())[0]]
+                    if lst_dict.keys():
+                        suggested = lst_dict[sorted(lst_dict.keys())[0]]
             if suggested:
                 output.append(suggested)
             else:
