@@ -62,7 +62,7 @@ def spell_check_driver(input_words):
     # if we have neither, do dict of know words just by order of changing
     # if we have it in a context, then do by highest context value
     spell_dict = load_known_words()
-    cm = dm.load_context("../..")
+    cm = dm.load_context(os.path.join(os.path.dirname(os.path.abspath(__file__)),"../.."))
 
     l = len(input_words)
     output = []
@@ -83,8 +83,6 @@ def spell_check_driver(input_words):
             if ct+1 < l:
                 pos = input_words[ct+1]
 
-            ctx_pre = None
-            ctx_post = None
 
             if pre and pos:
                 (ctx_pre_f, ctx_pre_b) = cm[pre].get_context()

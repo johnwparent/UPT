@@ -30,6 +30,20 @@ class DDict(object):
         return hash(self.back) + hash(self.front)
 
 
+class Freq(object):
+    def __init__(self, token, count=0):
+        self.token = token
+        self.count = count
+
+    def hash(self):
+        return hash(self.token) + hash(self.count)
+
+    def inc(self):
+        self.count +=1
+
+    def __lt__(self, other):
+        return self.count < other.count
+
 class ContextManager(object):
     def __init__(self):
         self.unique_words = 0
@@ -78,11 +92,11 @@ class Context(object):
 
     def add_context(self, contexta, contextb):
         if contexta and contexta not in self.__context:
-            self.__context[contexta] = 1
+            self.__context[contexta] = Freq(contexta)
         elif contexta:
-            self.__context[contexta] += 1
+            self.__context[contexta].inc()
 
         if contextb and contextb not in self.__context:
-            self.__context[contextb] = 1
+            self.__context[contextb] = Freq(contextb)
         elif contextb:
-            self.__context[contextb] += 1
+            self.__context[contextb].inc()

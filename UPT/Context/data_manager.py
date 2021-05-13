@@ -6,11 +6,11 @@ import glob
 from .context import ContextManager
 
 def sanitze_data(data):
-    SYMS = r'[^\s\w]'
-    ndata = re.sub(SYMS,"",data)
+    SYMS = r'[^\w ]'
+    ndata = re.sub(SYMS,"",data,flags=re.ASCII)
     data = ndata.lower()
     d_lst = data.split(" ")
-    d_lst = [x for x in d_lst if x != " "]
+    d_lst = [x for x in d_lst if x != " " and x != ""]
     return d_lst
 
 
@@ -65,7 +65,7 @@ def pull_down_data(data_root):
     files = walk_files_directory(data_root)
     print(len(files))
     urls = []
-    for x in range(5000):
+    for x in range(100):
         url = find_url(files[x])
         if url:
             urls.append(url)
@@ -84,7 +84,7 @@ def load_context(data):
     if not os.path.exists(data_dir):
         print("Pulling data from proj gut")
         cm = pull_down_data(data)
-
+        print("done pulling data from gut")
         with open(data_dir,"wb") as pickle_data:
             pickle.dump(cm, pickle_data, -1)
     else:
@@ -107,7 +107,12 @@ def build_context(input):
                 head = None
                 h_w = None
 
-        if t_w != word:
+        if t_w == word:
+            try:
+                word = next(current)
+            except StopIteration:
+                break
+        else:
             try:
                 t_w = next(tail)
             except StopIteration:
