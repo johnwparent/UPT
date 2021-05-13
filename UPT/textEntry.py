@@ -1,9 +1,14 @@
 # displays a gui for the user to enter text into
 import tkinter as tk
 from tkinter import ttk
+import os
+from .Context import data_manager as dm
+from .Context import context as c
+from .CorrectText import load_known_words
 
 
-
+spell_dict = load_known_words()
+cm = dm.load_context(os.path.join(os.path.dirname(os.path.abspath(__file__)),".."))
 
 def spell_check():
     # grabs textbox input and displays popup window showing spellcheck options. Sets textbox with result if user makes changes.

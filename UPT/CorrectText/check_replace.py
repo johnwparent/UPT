@@ -46,8 +46,8 @@ def use_context(total_words, known_words, tot_dict):
     max_w = ""
     if potential_words:
         for w in list(potential_words):
-            if tot_dict[w] > max_f:
-                max_f = tot_dict[w]
+            if tot_dict[w].count > max_f:
+                max_f = tot_dict[w].count
                 max_w = w
         return max_w
     else:
@@ -67,12 +67,10 @@ def spell_check_driver(input_words):
     l = len(input_words)
     output = []
     known_set = set(spell_dict)
-    import pdb; pdb.set_trace()
     for ct,word in enumerate(input_words):
         if word in alphabet:
             output.append(word)
             continue
-        output.append(" ")
         if word not in spell_dict:
             first_deg_sep = execute_alterations(word)
             sec_deg_sep = execute_alterations(word,count=2)
