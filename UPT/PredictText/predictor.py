@@ -2,18 +2,39 @@
 
 
 from typing import Counter
+import os
 import nltk
-# from .Context import data_manager
+from UPT import CorrectText
+from ..Context import data_manager as dm
+from ..Context import context as c
+import random
 
-def collect_trigrams(data):
-    # returns a list of 30 most common trigrams
-    trigrams = Counter(zip(*[data[i:] for i in range(3)]))
-    # getting thirty most common
-    return trigrams.most_common(3)
+def collect_trigrams(word,prev_word,context):
+    # returns 5 most common trigrams with "word"
+    _, freq = context[word].get_context()
+    freq_sort = sorted(freq.keys())
+    tgs = set()
+    for i in range(0,5):
+        tgs.add(freq[freq_sort[i]].token)
+    _, freq2 = context[prev_word].get_context()
+    freq2_sort = sorted(freq2.keys())
+    p_tgs = set()
+    for j in range(0,5):
+        p_tgs.add(freq2[freq2_sort[i]].token)
+    
+    ovr = p_tgs & tgs
+    if ovr:
+        return ovr
+    return None
 
-def collect_bigrams(word):
-    # returns a list of 5 most common bigrams with "word" as 1st word
-    pass
+def collect_bigrams(word, context):
+    # returns a list of 5 most common bigrams with "word"
+    _, freq = context[word].get_context()
+    freq_sort = sorted(freq.keys())
+    bgs = []
+    for i in range(0,5):
+        bgs.append(freq[freq_sort[i]].token)
+    return bgs
 
 def remove_words(list, bg, tg):
     # removes words in list from trigram lists
@@ -26,36 +47,36 @@ def remove_words(list, bg, tg):
             if badword in b_entry:
                 b_entry.delete()
 
-def get_restarter(data):
-    # pick a random word from bag of words and return it
-    restarter = "owen"
-    return restarter
+def get_restarter(known_words):
+    # pick a random word from data and return it
+    r = random.randrange(400000)
+    return known_words[r]
 
 
-def generate_suggestions(words, context):
+def generate_suggestions(words, context, known_words):
     # set word to last element in words
     word = words[-1]
     prev_words = words[len(words)-5:len(words)-1]
     # 1. pull top 30 trigrams from data
-    tgs = collect_trigrams(data)
+    tgs = collect_trigrams(word,prev_words[-1],context)
     # 2. get top bigrams using word
-    bgs = collect_bigrams(word)
+    bgs = collect_bigrams(word,context)
     # 3. remove words in previous words list from lists
     remove_words(prev_words,bgs,tgs)
     # 4. create a list to populate with top 3 suggested words
-    suggestion_list = {}
-    # if word and word-1 are the first 2 entries in a trigram, that should be #1
-    for trigram in tgs:
-        if str(prev_words[-1] + " " + word).lower() == str(trigram[0][0] + " " + trigram[0][0]).lower():
-            suggestion_list.append(trigram[0][2])
+    suggestion_list = []
+    # if we have a trigram, that should be #1
+    if tgs:
+        for trigram in tgs:
+            suggestion_list.append(trigram)
     # fill remaining entries with 2 most common bigrams
     n = len(suggestion_list)
-    for i in range(0, 3-n,1):
-        # if bgs[i] is of type [[word1,word2],freq], this gets word2
-        suggestion_list.append(bgs[i][0][1])        
+    if bgs:
+        for i in range(0, 3-n,1):
+            suggestion_list.append(bgs[i])        
     # if there are still less than 3 elements in suggestion_list, fill it with random words
     while len(suggestion_list) < 3:
-        suggestion_list.append(context)
+        suggestion_list.append(get_restarter(known_words))
 
 
 
