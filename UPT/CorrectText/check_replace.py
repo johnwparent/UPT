@@ -18,7 +18,7 @@ def drop_letter(word, count=1):
     return [ word[:idx]+word[idx+count:] for idx in range(len(word)) ]
 
 def swap_order(word, count=1):
-    return [ word[idx+1]+word[idx]+word[idx+1:]  for idx in range(len(word)-1) ]
+    return [ word[idx+1]+word[idx]+word[idx+1:]  for idx in range(len(word)) ]
 
 def rev(word, count=1):
     return [ rev_substr(word, count, idx) for idx in range(len(word)) ]
@@ -120,7 +120,7 @@ def spell_check_driver(input_words, spell_dict, cm):
                     for test_word in lst:
                         dst = compute_distance(test_word, word)
                         lst_dict[dst] = test_word
-                    if lst_dict.keys():
+                    if lst_dict:
                         suggested = lst_dict[sorted(lst_dict.keys())[0]]
             if suggested:
                 output.append(suggested)
