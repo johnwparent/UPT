@@ -1,5 +1,5 @@
 import os
-import nltk
+from nltk.metrics import edit_distance
 from ..Context import data_manager as dm
 from ..Context import context as c
 
@@ -38,7 +38,7 @@ def load_known_words():
     return word_s
 
 def compute_distance(worda, wordb):
-    return nltk.metrics.distance.edit_distance(worda, wordb)
+    return edit_distance(worda, wordb)
 
 def use_context(total_words, known_words, tot_dict):
     potential_words = total_words & known_words
