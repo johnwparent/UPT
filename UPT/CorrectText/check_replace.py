@@ -74,6 +74,7 @@ def spell_check_driver(input_words):
         if word not in spell_dict:
             first_deg_sep = execute_alterations(word)
             sec_deg_sep = execute_alterations(word,count=2)
+            all_changes = set.union(first_deg_sep,sec_deg_sep)
             pre = ""
             pos = ""
             if ct-1 >= 0:
@@ -81,23 +82,24 @@ def spell_check_driver(input_words):
             if ct+1 < l:
                 pos = input_words[ct+1]
 
-
+            suggested = ""
             if pre and pos:
                 (ctx_pre_f, ctx_pre_b) = cm[pre].get_context()
                 (ctx_post_f, ctx_post_b) = cm[pos].get_context()
                 tot_dict = {**ctx_post_f,**ctx_pre_f}
                 tot_ctx_wrds = set(ctx_pre_f.keys()) & set(ctx_post_f.keys())
-                suggested = use_context(tot_ctx_wrds, known_set, tot_dict)
+
+                suggested = use_context(tot_ctx_wrds, all_changes, tot_dict)
             elif pre:
                 (ctx_pre_f, ctx_pre_b) = cm[pre].get_context()
                 tot_ctx_wrds = set(ctx_pre_f.keys())
-                suggested = use_context(tot_ctx_wrds, known_set, ctx_pre_f)
+                suggested = use_context(tot_ctx_wrds, all_changes, ctx_pre_f)
             elif pos:
                 (ctx_post_f, ctx_post_b) = cm[pos].get_context()
                 tot_ctx_wrds = set(ctx_post_f.keys())
-                suggested = use_context(tot_ctx_wrds, known_set, ctx_post_f)
+                suggested = use_context(tot_ctx_wrds, all_changes, ctx_post_f)
 
-            else:
+            if not suggested:
                 first_deg_set = set(first_deg_sep)
                 first_inter = known_set & first_deg_set
                 if first_inter:
