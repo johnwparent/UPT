@@ -53,7 +53,7 @@ def use_context(total_words, known_words, tot_dict):
     else:
         return None
 
-def spell_check_driver(input_words):
+def spell_check_driver(input_words, spell_dict, cm):
     # check if there are words before or back or both
     # if just one or the other reference that for context
     # if both, do intersection of options

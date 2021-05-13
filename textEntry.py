@@ -16,7 +16,7 @@ def spell_check():
     text = textbox.get("1.0","end-1c")
     text_list = text.split(" ")
     # list with corrections for each word
-    correction_list = spell_check_driver(text_list)
+    correction_list = spell_check_driver(text_list, spell_dict, cm)
     # creating popup, headers, and submit button
     spell = tk.Tk()
     spell.title("Spellcheck")
