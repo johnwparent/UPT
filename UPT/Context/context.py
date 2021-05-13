@@ -81,22 +81,22 @@ class ContextManager(object):
 class Context(object):
     def __init__(self, token, obj=DDict()):
         self.token = token
-        self.__context = obj
+        self.__context = {}
         super().__init__()
 
     def __hash__(self):
         return hash(self.token)
 
     def get_context(self):
-        return (self.__context.get_front(), self.__context.get_back())
+        return (self.__context)
 
     def add_context(self, contexta, contextb):
         if contexta and contexta not in self.__context:
-            self.__context[contexta] = Freq(contexta)
+            self.__context[contexta] = (contexta,1)
         elif contexta:
-            self.__context[contexta].inc()
+            self.__context[contexta] = (contexta,self.__context[contexta][1]+1)
 
         if contextb and contextb not in self.__context:
-            self.__context[contextb] = Freq(contextb)
+            self.__context[contextb] = (contextb,1)
         elif contextb:
-            self.__context[contextb].inc()
+            self.__context[contextb] = (contextb,self.__context[contextb][1]+1)

@@ -46,8 +46,8 @@ def use_context(total_words, known_words, tot_dict):
     max_w = ""
     if potential_words:
         for w in list(potential_words):
-            if tot_dict[w].count > max_f:
-                max_f = tot_dict[w].count
+            if tot_dict[w][1] > max_f:
+                max_f = tot_dict[w][1]
                 max_w = w
         return max_w
     else:
@@ -84,18 +84,18 @@ def spell_check_driver(input_words, spell_dict, cm):
 
             suggested = ""
             if pre and pos:
-                (ctx_pre_f, ctx_pre_b) = cm[pre].get_context()
-                (ctx_post_f, ctx_post_b) = cm[pos].get_context()
+                ctx_pre_f = cm[pre].get_context()
+                ctx_post_f = cm[pos].get_context()
                 tot_dict = {**ctx_post_f,**ctx_pre_f}
                 tot_ctx_wrds = set(ctx_pre_f.keys()) & set(ctx_post_f.keys())
 
                 suggested = use_context(tot_ctx_wrds, all_changes, tot_dict)
             elif pre:
-                (ctx_pre_f, ctx_pre_b) = cm[pre].get_context()
+                ctx_pre_f = cm[pre].get_context()
                 tot_ctx_wrds = set(ctx_pre_f.keys())
                 suggested = use_context(tot_ctx_wrds, all_changes, ctx_pre_f)
             elif pos:
-                (ctx_post_f, ctx_post_b) = cm[pos].get_context()
+                ctx_post_f = cm[pos].get_context()
                 tot_ctx_wrds = set(ctx_post_f.keys())
                 suggested = use_context(tot_ctx_wrds, all_changes, ctx_post_f)
 

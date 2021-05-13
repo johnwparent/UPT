@@ -31,12 +31,12 @@ import random
 
 def collect_bigrams(word, context, a, b):
     # returns a list of 5 most common bigrams with "word"
-    _, freq = context[word].get_context()
-    freq_sort = sorted(freq.keys())[::-1]
+    freq = context[word].get_context()
+    freq_sort = sorted(freq.values(), key=lambda tup: tup[1])[::-1]
     bgs = []
     if len(freq_sort) > b-1:
         for i in range(a,b):
-            bgs.append(freq[freq_sort[i]])
+            bgs.append(freq_sort[i][0])
     return bgs
 
 def remove_words(list, bg):
@@ -71,9 +71,6 @@ def generate_suggestions(words, context, known_words):
     bgs = collect_bigrams(word,context,0,5)
     bgs1 = collect_bigrams(word,context,15,20)
     bgs2 = collect_bigrams(word,context,250,255)
-    print(bgs)
-    print(bgs1)
-    print(bgs2)
 
     # 3. remove words in previous words list from lists
     bgs = remove_words(words,bgs)
