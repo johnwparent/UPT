@@ -37,6 +37,8 @@ def get_restarters(data):
 
 def generate_suggestions(word, prev_words):
     # calls other functions to return 3 selected words
+    # 0. read in data
+
     # 1. pull top 30 trigrams from data
     tgs = collect_trigrams(data)
     # 2. get top bigrams using word
